@@ -1,0 +1,44 @@
+name: Run Colab Notebook
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  run-colab:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install papermill nbconvert
+    
+    - name: Run Colab Notebook
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+      run: |
+        # 使用 papermill 执行 Notebook
+        papermill test_simple.ipynb output.ipynb
+        
+        # 转换结果为 HTML（可选）
+        jupyter nbconvert --to html output.ipynb
+        
+        echo "✅ Notebook 执行完成！"
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: colab-results
+        path: |
+          output.ipynb
+          output.html
+        retention-days: 30
