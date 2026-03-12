@@ -20,7 +20,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install papermill nbconvert ipykernel
+        pip install papermill nbconvert ipykernel numpy
         python -m ipykernel install --user
     
     - name: Run Colab Notebook
